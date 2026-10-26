@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Beneath the Surface — Underwater Diving Portfolio</title>
+  <meta name="description" content="Every dive reveals a story the ocean has been keeping. An underwater diving and photography portfolio exploring the hidden beauty beneath the surface." />
+  <meta property="og:title" content="Beneath the Surface — Underwater Portfolio" />
+  <meta property="og:description" content="Exploring hidden worlds beneath the waves — diving, expedition, and underwater photography." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='%230a1d2e' stroke='%235eb8d4' stroke-width='2'/><circle cx='16' cy='16' r='6' fill='%235eb8d4'/></svg>" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- BACKGROUND OCEAN PARTICLES CANVAS -->
+  <canvas id="ocean-canvas" class="ocean-canvas" aria-hidden="true"></canvas>
+
+  <!-- CUSTOM CURSOR -->
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-follower" id="cursor-follower"></div>
+
+  <!-- FLOATING DIVE HUD (ZONE & DEPTH INDICATOR) -->
+  <aside class="dive-hud" id="dive-hud" aria-label="Current dive status">
+    <div class="hud-inner">
+      <div class="hud-indicator-dot"></div>
+      <div class="hud-data">
+        <span class="hud-depth" id="hud-depth">0.0m</span>
+        <span class="hud-zone" id="hud-zone">SUNLIGHT ZONE</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- LOADING SCREEN -->
+  <div class="loader" id="loader">
+    <div class="loader-inner">
+      <div class="loader-depth">
+        <span class="loader-depth-line"></span>
+      </div>
+      <p class="loader-text">descending into the deep</p>
+      <div class="loader-counter" id="loader-counter">0m</div>
+    </div>
+  </div>
+
+  <!-- NAV -->
+  <nav class="nav" id="nav" role="navigation" aria-label="Main navigation">
+    <a href="#hero" class="nav-brand" aria-label="Go to homepage">
+      <span class="nav-brand-text">BENEATH</span>
+      <span class="nav-brand-sub">THE SURFACE</span>
+    </a>
+    
+    <div class="nav-links">
+      <a href="#story" class="nav-link" data-hover="Story">Story</a>
+      <a href="#dive" class="nav-link" data-hover="Dive">Dive</a>
+      <a href="#expedition" class="nav-link" data-hover="Expedition">Expedition</a>
+      <a href="#gallery" class="nav-link" data-hover="Gallery">Gallery</a>
+    </div>
+
+    <div class="nav-controls">
+      <!-- AMBIENT HYDROPHONE SOUND TOGGLE -->
+      <button class="sound-toggle" id="sound-toggle" aria-label="Toggle ocean ambient sound" title="Toggle underwater atmosphere sound">
+        <span class="sound-bars" aria-hidden="true">
+          <span class="sound-bar"></span>
+          <span class="sound-bar"></span>
+          <span class="sound-bar"></span>
+          <span class="sound-bar"></span>
+        </span>
+        <span class="sound-label" id="sound-label">AUDIO OFF</span>
+      </button>
+
+      <!-- MOBILE MENU BUTTON -->
+      <button class="nav-menu-btn" id="nav-menu-btn" aria-label="Toggle navigation menu" aria-expanded="false">
+        <span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- MOBILE MENU -->
+  <div class="mobile-menu" id="mobile-menu" role="dialog" aria-label="Mobile navigation">
+    <div class="mobile-menu-bg"></div>
+    <div class="mobile-menu-links">
+      <a href="#story" class="mobile-link">Story</a>
+      <a href="#dive" class="mobile-link">Dive</a>
+      <a href="#expedition" class="mobile-link">Expedition</a>
+      <a href="#gallery" class="mobile-link">Gallery</a>
+    </div>
+    <div class="mobile-menu-footer">Every dive reveals a story the ocean has been keeping.</div>
+  </div>
+
+  <!-- ================ HERO ================ -->
+  <section class="hero" id="hero" aria-label="Hero">
+    <div class="hero-bg">
+      <img 
+        src="9222B81F-1426-4876-AC61-04862D542E8E.png" 
+        alt="Diver silhouetted against sunrays penetrating the ocean surface"
+        class="hero-img"
+        id="hero-img"
+      />
+      <div class="hero-overlay"></div>
+      <div class="hero-vignette"></div>
+    </div>
+
+    <div class="hero-content">
+      <div class="hero-eyebrow reveal-text">
+        <span class="eyebrow-line"></span>
+        <span>Ocean · Expedition · Photography</span>
+      </div>
+      <h1 class="hero-title">
+        <span class="hero-title-line reveal-line" aria-label="Every dive">
+          <span>Every dive</span>
+        </span>
+        <span class="hero-title-line reveal-line" aria-label="reveals a story.">
+          <em class="hero-title-italic">reveals</em> <span>a story.</span>
+        </span>
+      </h1>
+      
+      <div class="hero-meta-row">
+        <p class="hero-sub reveal-text">
+          Menjelajahi keindahan yang tersembunyi di bawah permukaan.
+        </p>
+      </div>
+    </div>
+
+    <!-- HERO DEPTH WIDGET (POSITIONED SAFELY TO AVOID TEXT COLLISION) -->
+    <div class="hero-depth-indicator" aria-hidden="true">
+      <span class="depth-label">LOG DEPTH</span>
+      <span class="depth-value" id="hero-depth">0.0m</span>
+    </div>
+
+    <!-- SCROLL CUE -->
+    <div class="hero-scroll-cue" aria-hidden="true">
+      <div class="scroll-line"></div>
+      <span>Scroll to descend</span>
+    </div>
+  </section>
+
+  <!-- ================ INTRO STATEMENT ================ -->
+  <section class="intro-statement" id="story" aria-label="Story introduction">
+    <div class="intro-grid">
+      <div class="intro-number reveal-text" aria-hidden="true">01</div>
+      <div class="intro-content">
+        <blockquote class="intro-quote">
+          <p class="intro-quote-text reveal-text">
+            The ocean keeps more stories than we can imagine. Through diving, exploration, and photography — I seek to understand every detail, from the smallest life between the corals to the ecosystems that shape the balance of the sea.
+          </p>
+        </blockquote>
+        <div class="intro-meta reveal-text">
+          <span class="intro-meta-item">Diving</span>
+          <span class="intro-meta-dot" aria-hidden="true">·</span>
+          <span class="intro-meta-item">Exploration</span>
+          <span class="intro-meta-dot" aria-hidden="true">·</span>
+          <span class="intro-meta-item">Photography</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================ DIVE FEATURE ================ -->
+  <section class="dive-feature" id="dive" aria-label="Dive feature">
+    <div class="dive-sticky-container">
+      <div class="dive-sticky">
+        <div class="dive-image-wrap" id="dive-image-wrap">
+          <img 
+            src="9E2E871A-1144-424F-B2F2-C6369489997D.png"
+            alt="Scuba diver exploring a rocky reef with dramatic light rays above"
+            class="dive-img active"
+            id="dive-img-1"
+          />
+          <img 
+            src="DJI_20260601115204_0049_D.jpeg"
+            alt="Diver with scooter propeller gliding over a coral reef"
+            class="dive-img dive-img-hidden"
+            id="dive-img-2"
+          />
+          <img 
+            src="F168453C-965B-4968-97D2-008452A3A283.png"
+            alt="Close-up portrait of a diver with light rays and coral formation"
+            class="dive-img dive-img-hidden"
+            id="dive-img-3"
+          />
+        </div>
+        <div class="dive-gradient-overlay" aria-hidden="true"></div>
+      </div>
+    </div>
+
+    <div class="dive-text-panels">
+      <div class="dive-panel" data-image="1">
+        <div class="dive-panel-inner">
+          <span class="panel-tag">— Beneath the Surface</span>
+          <h2 class="panel-heading">
+            <span class="panel-word">Menjelajahi</span>
+            <span class="panel-word">keindahan</span>
+            <span class="panel-word panel-italic">tersembunyi</span>
+          </h2>
+          <p class="panel-body">
+            Menemukan kehidupan yang jarang terlihat, dan memahami bahwa laut menyimpan lebih banyak cerita daripada yang bisa kita bayangkan.
+          </p>
+        </div>
+      </div>
+
+      <div class="dive-panel" data-image="2">
+        <div class="dive-panel-inner">
+          <span class="panel-tag">— The Gear &amp; Propulsion</span>
+          <h2 class="panel-heading">
+            <span class="panel-word">Propelled</span>
+            <span class="panel-word">through</span>
+            <span class="panel-word panel-italic">the deep</span>
+          </h2>
+          <p class="panel-body">
+            Melalui diving, eksplorasi, dan fotografi, saya berusaha memahami setiap detailnya dari kehidupan kecil di antara karang hingga ekosistem yang membentuk keseimbangan laut.
+          </p>
+        </div>
+      </div>
+
+      <div class="dive-panel" data-image="3">
+        <div class="dive-panel-inner">
+          <span class="panel-tag">— Face to Face</span>
+          <h2 class="panel-heading">
+            <span class="panel-word">Eye level</span>
+            <span class="panel-word panel-italic">with</span>
+            <span class="panel-word">the abyss</span>
+          </h2>
+          <p class="panel-body">
+            Karena semakin jauh kita mengenal laut, semakin besar alasan kita untuk menjaganya.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================ FULL SCREEN QUOTE ================ -->
+  <section class="fullscreen-quote" aria-label="Full screen quote">
+    <div class="fq-bg">
+      <img 
+        src="quality_restoration_20260208140053723.jpeg"
+        alt="Diver floating weightlessly in open blue water with arms outstretched"
+        class="fq-img"
+      />
+      <div class="fq-overlay"></div>
+    </div>
+    <div class="fq-content">
+      <p class="fq-pre reveal-text">Some stories are</p>
+      <h2 class="fq-text fq-anim reveal-line">
+        <span class="fq-word">better</span>
+        <span class="fq-word fq-italic">felt</span>
+        <span class="fq-word">than</span>
+        <span class="fq-word">told.</span>
+      </h2>
+      <p class="fq-caption reveal-text">
+        Ada keindahan yang tidak membutuhkan banyak kata.<br>
+        Cahaya matahari yang menembus birunya air.
+      </p>
+    </div>
+  </section>
+
+  <!-- ================ EXPEDITION ================ -->
+  <section class="expedition" id="expedition" aria-label="Expedition section">
+    <div class="expedition-header">
+      <div class="expedition-tag reveal-text">02 — Expedition</div>
+      <h2 class="expedition-title">
+        <span class="exp-line reveal-line"><span>Every destination</span></span>
+        <span class="exp-line exp-italic reveal-line"><em>leaves a mark.</em></span>
+      </h2>
+      <p class="expedition-sub reveal-text">Every expedition tells a story.</p>
+    </div>
+
+    <div class="expedition-grid">
+      <!-- Card 1 -->
+      <article 
+        class="exp-card" 
+        tabindex="0"
+        data-lightbox="true"
+        data-title="Looking Up into the Light"
+        data-depth="24.5m"
+        data-location="Banda Sea, Maluku"
+        data-gear="Wide Angle Lens · Ambient Sunlight"
+      >
+        <div class="exp-card-img-wrap">
+          <img 
+            src="DJI_20260601150548_0134_D.jpeg"
+            alt="Diver looking upward through crystal clear water toward the surface"
+            class="exp-card-img"
+          />
+          <div class="exp-card-hover-hint">
+            <span class="hint-icon">⊕</span>
+            <span>View Log</span>
+          </div>
+        </div>
+        <div class="exp-card-info">
+          <span class="exp-card-tag">Deep Water</span>
+          <h3 class="exp-card-title">Looking Up</h3>
+          <p class="exp-card-text">Tidak semua perjalanan tentang seberapa jauh kita melangkah.</p>
+        </div>
+      </article>
+
+      <!-- Card 2 -->
+      <article 
+        class="exp-card" 
+        tabindex="0"
+        data-lightbox="true"
+        data-title="Buddy Team — Coral Reef Transect"
+        data-depth="32.0m"
+        data-location="Alor Strait, Nusa Tenggara Timur"
+        data-gear="Scientific Transect Quadrat · Wide Lens"
+      >
+        <div class="exp-card-img-wrap">
+          <img 
+            src="2AC51A88-DEBC-4652-A17F-EB0FA5F8B8DB.png"
+            alt="Two divers conducting coral reef transect survey with bubbles rising toward the surface"
+            class="exp-card-img"
+          />
+          <div class="exp-card-hover-hint">
+            <span class="hint-icon">⊕</span>
+            <span>View Log</span>
+          </div>
+        </div>
+        <div class="exp-card-info">
+          <span class="exp-card-tag">The People</span>
+          <h3 class="exp-card-title">Not Alone</h3>
+          <p class="exp-card-text">The people. The stories.</p>
+        </div>
+      </article>
+
+      <!-- Card 3 -->
+      <article 
+        class="exp-card" 
+        tabindex="0"
+        data-lightbox="true"
+        data-title="Into Darkness — Night Exploration"
+        data-depth="14.8m"
+        data-location="Lembeh Strait, North Sulawesi"
+        data-gear="4000lm Primary Torch · Macro Exploration"
+      >
+        <div class="exp-card-img-wrap">
+          <img 
+            src="c9e087a3-acd1-42b5-82d1-367a019dd4ee.jpg"
+            alt="Night dive — two divers illuminated by torch light in total darkness"
+            class="exp-card-img"
+          />
+          <div class="exp-card-hover-hint">
+            <span class="hint-icon">⊕</span>
+            <span>View Log</span>
+          </div>
+        </div>
+        <div class="exp-card-info">
+          <span class="exp-card-tag">Night Dive</span>
+          <h3 class="exp-card-title">Into Darkness</h3>
+          <p class="exp-card-text">Setiap koordinat menyimpan kenangan.</p>
+        </div>
+      </article>
+    </div>
+
+    <div class="expedition-statement reveal-text">
+      <p>THE PLACES. THE PEOPLE. THE STORIES.</p>
+      <span>Setiap perjalanan menjadi bagian dari cerita yang masih terus ditulis.</span>
+    </div>
+  </section>
+
+  <!-- ================ HORIZONTAL GALLERY ================ -->
+  <section class="gallery-section" id="gallery" aria-label="Photo gallery">
+    <div class="gallery-header">
+      <div class="gallery-header-left">
+        <div class="gallery-tag reveal-text">03 — Gallery</div>
+        <h2 class="gallery-title reveal-line">
+          <span class="gallery-title-line">The Silence</span>
+          <span class="gallery-title-line"><em class="gallery-title-italic">Below</em></span>
+        </h2>
+      </div>
+      <div class="gallery-header-right reveal-text">
+        <p class="gallery-subtext">Klik foto untuk melihat log detail penyelaman &amp; resolusi penuh.</p>
+      </div>
+    </div>
+
+    <div class="gallery-track-wrap" id="gallery-track-wrap">
+      <div class="gallery-track" id="gallery-track">
+        <figure 
+          class="gallery-item gi-wide" 
+          tabindex="0"
+          data-lightbox="true"
+          data-title="Descent into Light"
+          data-depth="18.5m"
+          data-location="Raja Ampat, Southwest Papua"
+          data-gear="16mm · f/2.8 · ISO 200 · Natural Caustic"
+        >
+          <img 
+            src="9222B81F-1426-4876-AC61-04862D542E8E.png" 
+            alt="Diver descending into light — full silhouette against sunrays"
+            loading="lazy"
+          />
+          <figcaption>
+            <span>Descent into Light</span>
+            <span class="item-zoom-badge">EXPAND</span>
+          </figcaption>
+        </figure>
+
+        <figure 
+          class="gallery-item gi-wide" 
+          tabindex="0"
+          data-lightbox="true"
+          data-title="Face of the Deep"
+          data-depth="14.2m"
+          data-location="Komodo National Park"
+          data-gear="24mm · f/4.0 · ISO 400 · Coral Reef"
+        >
+          <img 
+            src="F168453C-965B-4968-97D2-008452A3A283.png" 
+            alt="Diver eye-level portrait with sun rays and vibrant marine background"
+            loading="lazy"
+          />
+          <figcaption>
+            <span>Face of the Deep</span>
+            <span class="item-zoom-badge">EXPAND</span>
+          </figcaption>
+        </figure>
+
+        <figure 
+          class="gallery-item gi-wide" 
+          tabindex="0"
+          data-lightbox="true"
+          data-title="Reef Explorer"
+          data-depth="22.0m"
+          data-location="Wakatobi Marine Park"
+          data-gear="16mm · f/3.2 · ISO 250 · Blue Ridge"
+        >
+          <img 
+            src="9E2E871A-1144-424F-B2F2-C6369489997D.png" 
+            alt="Diver over coral reef with dramatic blue light and bubbles rising"
+            loading="lazy"
+          />
+          <figcaption>
+            <span>Reef Explorer</span>
+            <span class="item-zoom-badge">EXPAND</span>
+          </figcaption>
+        </figure>
+
+        <figure 
+          class="gallery-item gi-tall" 
+          tabindex="0"
+          data-lightbox="true"
+          data-title="Weightless Suspension"
+          data-depth="28.5m"
+          data-location="Banda Sea Outer Edge"
+          data-gear="14mm Ultra-Wide · Neutral Buoyancy"
+        >
+          <img 
+            src="quality_restoration_20260208140053723.jpeg" 
+            alt="Diver suspended in open water with arms wide open"
+            loading="lazy"
+          />
+          <figcaption>
+            <span>Weightless</span>
+            <span class="item-zoom-badge">EXPAND</span>
+          </figcaption>
+        </figure>
+
+        <figure 
+          class="gallery-item gi-square" 
+          tabindex="0"
+          data-lightbox="true"
+          data-title="DPV · Coral Gardens"
+          data-depth="15.0m"
+          data-location="Bunaken Marine Sanctuary"
+          data-gear="Underwater Scooter (DPV) Expedition"
+        >
+          <img 
+            src="DJI_20260601115204_0049_D.jpeg" 
+            alt="Diver with underwater scooter above coral formations"
+            loading="lazy"
+          />
+          <figcaption>
+            <span>DPV · Coral Gardens</span>
+            <span class="item-zoom-badge">EXPAND</span>
+          </figcaption>
+        </figure>
+
+        <figure 
+          class="gallery-item gi-wide" 
+          tabindex="0"
+          data-lightbox="true"
+          data-title="The Wall"
+          data-depth="32.4m"
+          data-location="Pantar Strait, Alor"
+          data-gear="28mm · Deep Coral Wall Drop"
+        >
+          <img 
+            src="2AC51A88-DEBC-4652-A17F-EB0FA5F8B8DB.png" 
+            alt="Two divers swimming beside coral reef transect in deep blue ocean"
+            loading="lazy"
+          />
+          <figcaption>
+            <span>The Wall</span>
+            <span class="item-zoom-badge">EXPAND</span>
+          </figcaption>
+        </figure>
+
+        <figure 
+          class="gallery-item gi-wide" 
+          tabindex="0"
+          data-lightbox="true"
+          data-title="Mid-Water Ascent"
+          data-depth="19.8m"
+          data-location="Tulamben Shelf, Bali"
+          data-gear="Ambient Light · Rising Bubble Stream"
+        >
+          <img 
+            src="dji_mimo_20260208_112540_20260208112540_1770529572917_photo.JPG" 
+            alt="Diver mid-water with bubbles and sandy seabed below"
+            loading="lazy"
+          />
+          <figcaption>
+            <span>Mid-Water</span>
+            <span class="item-zoom-badge">EXPAND</span>
+          </figcaption>
+        </figure>
+
+        <figure 
+          class="gallery-item gi-wide" 
+          tabindex="0"
+          data-lightbox="true"
+          data-title="Night Dive Illumination"
+          data-depth="12.0m"
+          data-location="Lembeh Strait"
+          data-gear="Dual High-CRI Torches · Macro Search"
+        >
+          <img 
+            src="c9e087a3-acd1-42b5-82d1-367a019dd4ee.jpg" 
+            alt="Night dive with torches illuminating diver on the seabed"
+            loading="lazy"
+          />
+          <figcaption>
+            <span>Night Dive</span>
+            <span class="item-zoom-badge">EXPAND</span>
+          </figcaption>
+        </figure>
+      </div>
+    </div>
+
+    <div class="gallery-drag-hint" aria-hidden="true">
+      <span>drag / scroll gallery</span>
+      <svg width="40" height="12" viewBox="0 0 40 12" fill="none" aria-hidden="true">
+        <path d="M0 6h38M34 1l5 5-5 5" stroke="currentColor" stroke-width="1.2"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ================ LIGHT & SILENCE ================ -->
+  <section class="silence-section" aria-label="Light and silence">
+    <div class="silence-bg">
+      <img 
+        src="DJI_20260601150548_0134_D.jpeg" 
+        alt="Diver looking up at the shimmering water surface"
+        class="silence-img"
+      />
+      <div class="silence-overlay"></div>
+    </div>
+    <div class="silence-content">
+      <p class="silence-pre reveal-text">Ada keindahan yang tidak membutuhkan banyak kata.</p>
+      <h2 class="silence-title">
+        <span class="silence-line reveal-line"><span>Cahaya matahari</span></span>
+        <span class="silence-line silence-italic reveal-line"><em><span>menembus birunya air</span></em></span>
+      </h2>
+      <p class="silence-body reveal-text">
+        Gerakan ikan di antara terumbu karang, hingga keheningan yang hanya bisa ditemukan di bawah permukaan.
+      </p>
+    </div>
+  </section>
+
+  <!-- ================ CLOSING STATEMENT ================ -->
+  <section class="closing" id="closing" aria-label="Closing statement">
+    <div class="closing-bg">
+      <img 
+        src="IMG_2695.PNG" 
+        alt="Diver face close-up with bubbles exploding around their mask — raw and vivid"
+        class="closing-bg-img"
+      />
+      <div class="closing-overlay"></div>
+    </div>
+
+    <div class="closing-content">
+      <div class="closing-pre reveal-text">Mungkin kita tidak akan pernah mengetahui seluruh rahasia lautan.</div>
+      <div class="closing-main">
+        <div class="closing-line closing-and reveal-line"><span>AND</span></div>
+        <div class="closing-line closing-never reveal-line"><span>NEVER FORGET</span></div>
+      </div>
+      <div class="closing-rule reveal-text"></div>
+      <div class="closing-statement">
+        <span class="closing-stmt-word reveal-text">DON'T</span>
+        <span class="closing-stmt-word reveal-text" style="--d:0.1s">DIVE</span>
+        <span class="closing-stmt-word closing-stmt-accent reveal-text" style="--d:0.2s">ALONE.</span>
+      </div>
+    </div>
+
+    <div class="closing-post reveal-text">
+      Namun, setiap penyelaman, setiap perjalanan, dan setiap penemuan membawa kita sedikit lebih dekat untuk memahaminya.
+    </div>
+  </section>
+
+  <!-- ================ FOOTER ================ -->
+  <footer class="footer" aria-label="Site footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <span class="footer-brand-name">BENEATH THE SURFACE</span>
+        <span class="footer-brand-tagline">Ocean · Expedition · Photography</span>
+      </div>
+      <div class="footer-mid">
+        <p class="footer-quote">"The ocean has a memory."</p>
+      </div>
+      <div class="footer-right">
+        <span class="footer-coords">2°30'S · 118°45'E</span>
+        <span class="footer-depth">∞ fathoms deep</span>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 · Beneath the Surface</span>
+      <span class="footer-bottom-right">All photographs and exploration logs are original works.</span>
+    </div>
+  </footer>
+
+  <!-- ================ LIGHTBOX MODAL ================ -->
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Photo details inspector" hidden>
+    <div class="lightbox-backdrop" id="lightbox-backdrop"></div>
+    <div class="lightbox-dialog">
+      <button class="lightbox-close" id="lightbox-close" aria-label="Close photo inspector">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <div class="lightbox-media">
+        <img src="" alt="" class="lightbox-img" id="lightbox-img" />
+      </div>
+
+      <div class="lightbox-info">
+        <div class="lightbox-info-header">
+          <span class="lightbox-badge">LOG // ARCHIVE</span>
+          <h3 class="lightbox-title" id="lightbox-title">Photo Title</h3>
+        </div>
+
+        <div class="lightbox-specs">
+          <div class="lightbox-spec-col">
+            <span class="spec-label">RECORDED DEPTH</span>
+            <span class="spec-value" id="lightbox-depth">18.5m</span>
+          </div>
+          <div class="lightbox-spec-col">
+            <span class="spec-label">COORDINATES &amp; SITE</span>
+            <span class="spec-value" id="lightbox-location">Raja Ampat, Indonesia</span>
+          </div>
+          <div class="lightbox-spec-col">
+            <span class="spec-label">OPTICS &amp; CONDITIONS</span>
+            <span class="spec-value" id="lightbox-gear">16mm Ultra-Wide · Ambient Light</span>
+          </div>
+        </div>
+
+        <div class="lightbox-nav-row">
+          <button class="lightbox-btn-nav" id="lightbox-prev" aria-label="Previous photograph">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+            <span>PREV</span>
+          </button>
+          <span class="lightbox-counter" id="lightbox-counter">1 / 8</span>
+          <button class="lightbox-btn-nav" id="lightbox-next" aria-label="Next photograph">
+            <span>NEXT</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>

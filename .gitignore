@@ -1,0 +1,18 @@
+# Dependency & build artifacts
+node_modules/
+.npm/
+
+# Testing & agent logs
+.playwright-mcp/
+.gemini/
+.tempmediaStorage/
+
+# Backups & local files
+_backup_portrait/
+*.tmp
+*.log
+
+# OS & system files
+.DS_Store
+Thumbs.db
+desktop.ini
